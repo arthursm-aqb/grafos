@@ -68,7 +68,7 @@ public class grafo{
         return novo;
     }
 
-    public aresta inserirAresta(vertice v, vertice w, Object o){
+    public aresta inserirAresta(vertice v, vertice w, Object o) throws erroGrafo{
 
         int i = vertices.indexOf(v);
         int j = vertices.indexOf(w);
@@ -82,11 +82,11 @@ public class grafo{
         int valor = adjacencias.get(i).get(j);
         adjacencias.get(i).set(j, valor+1);
         valor = adjacencias.get(j).get(i);
-        adjacencias.get(j).set(i, valor+1);
+        if(i!=j) adjacencias.get(j).set(i, valor+1);
         return novo;
     }
 
-    public Object removeVertice(vertice v){
+    public Object removeVertice(vertice v) throws erroGrafo{
 
         int i = vertices.indexOf(v);
 
@@ -104,5 +104,22 @@ public class grafo{
 
         return v.getValor();
 
+    }
+
+    public Object removeAresta(aresta e) throws erroGrafo{
+
+        int i = arestas.indexOf(e);
+
+        if (i==-1) throw new erroGrafo("Aresta não pertence ao grafo.");
+
+        arestas.remove(i);
+
+        i = vertices.indexOf(e.getOrigem());
+        int j = vertices.indexOf(e.getDestino());
+
+        adjacencias.get(i).set(j, adjacencias.get(i).get(j)-1);
+        if(i!=j) adjacencias.get(j).set(i, adjacencias.get(j).get(i)-1);
+
+        return e.getValor();
     }
 }
