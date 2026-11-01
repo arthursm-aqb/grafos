@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class grafo{
     private ArrayList<vertice> vertices;
@@ -39,15 +40,69 @@ public class grafo{
         return false;
     }
 
-    public vertice substituir(vertice v, Object x){
+    public void substituir(vertice v, Object x){
         if (!vertices.contains(v)) throw new erroGrafo("Vértice não pertence ao grafo.");
         v.setValor(x);
-        return v;
     }
 
-    public aresta substituir(aresta e, Object x){
+    public void substituir(aresta e, Object x){
         if (!arestas.contains(e)) throw new erroGrafo("Aresta não pertence ao grafo.");
         e.setValor(x);
-        return e;
+    }
+
+    public vertice inserirVertice(Object o){
+        vertice novo = new vertice(o);
+        vertices.add(novo);
+
+        for (ArrayList<Integer> linha : adjacencias) {
+            linha.add(0);
+        }
+
+        ArrayList<Integer> novaLinha = new ArrayList<>();
+        for (int i = 0; i < vertices.size(); i++) {
+            novaLinha.add(0);
+        }
+
+        adjacencias.add(novaLinha);
+
+        return novo;
+    }
+
+    public aresta inserirAresta(vertice v, vertice w, Object o){
+
+        int i = vertices.indexOf(v);
+        int j = vertices.indexOf(w);
+
+        if (i==-1 || j==-1) throw new erroGrafo("Vértice não pertence ao grafo.");
+
+        aresta novo = new aresta(v, w, o);
+        arestas.add(novo);
+
+
+        int valor = adjacencias.get(i).get(j);
+        adjacencias.get(i).set(j, valor+1);
+        valor = adjacencias.get(j).get(i);
+        adjacencias.get(j).set(i, valor+1);
+        return novo;
+    }
+
+    public Object removeVertice(vertice v){
+
+        int i = vertices.indexOf(v);
+
+        if (i==-1) throw new erroGrafo("Vértice não pertence ao grafo.");
+
+        vertices.remove(i);
+
+        for(ArrayList<Integer> linha : adjacencias){
+            linha.remove(i);
+        }
+
+        adjacencias.remove(i);
+
+        arestas.removeIf(e -> e.getOrigem().equals(v) || e.getDestino().equals(v));
+
+        return v.getValor();
+
     }
 }
