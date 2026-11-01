@@ -27,6 +27,27 @@ public class grafo{
 
         if(v.equals(e.getOrigem())) return e.getDestino();
         else return e.getOrigem();
+    }
 
+    public boolean eAdjacente(aresta v, aresta w){
+
+        if (v == w) return false;
+
+        if(v.getOrigem().equals(w.getOrigem()) || v.getOrigem().equals(w.getDestino())) return true;
+        if(v.getDestino().equals(w.getOrigem()) || v.getDestino().equals(w.getDestino())) return true;
+
+        return false;
+    }
+
+    public vertice substituir(vertice v, Object x){
+        if (!vertices.contains(v)) throw new erroGrafo("Vértice não pertence ao grafo.");
+        v.setValor(x);
+        return v;
+    }
+
+    public aresta substituir(aresta e, Object x){
+        if (!arestas.contains(e)) throw new erroGrafo("Aresta não pertence ao grafo.");
+        e.setValor(x);
+        return e;
     }
 }
