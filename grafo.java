@@ -122,4 +122,20 @@ public class grafo{
 
         return e.getValor();
     }
+
+    public Iterator<aresta> arestasIncidentes(vertice v) throws erroGrafo{
+        if (!vertices.contains(v)) throw new erroGrafo("Vértice não pertence ao grafo.");
+
+        ArrayList<aresta> incidentes = new ArrayList<>();
+        for (aresta e : arestas) {
+            if (e.getOrigem().equals(v) || e.getDestino().equals(v)) incidentes.add(e);
+        }
+
+        return incidentes.iterator();
+    }
+
+    public Iterator<vertice> vertices(){ return vertices.iterator();}
+
+
+    public Iterator<aresta> arestas(){ return arestas.iterator();}
 }
