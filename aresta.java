@@ -3,11 +3,17 @@ public class aresta {
     private vertice origem;
     private vertice destino;
     private Object valor;
+    private boolean direcionado;
 
     public aresta(vertice origem, vertice destino, Object valor) {
+        this(origem, destino, valor, false);
+    }
+
+    public aresta(vertice origem, vertice destino, Object valor, boolean direcao) {
         this.origem = origem;
         this.destino = destino;
         this.valor = valor;
+        this.direcionado = direcao;
     }
 
     public vertice getOrigem() {
@@ -37,4 +43,6 @@ public class aresta {
     public void setValor(Object valor) {
         this.valor = valor;
     }
+
+    public boolean ehDirecionado() { return direcionado; }
 }

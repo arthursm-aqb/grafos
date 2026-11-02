@@ -1,22 +1,25 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class grafo{
     private ArrayList<vertice> vertices;
     private ArrayList<ArrayList<Integer>> adjacencias;
+    private ArrayList<ArrayList<Integer>> adjacenciasDirecionado;
     private ArrayList<aresta> arestas;
 
     public grafo(){
-        this(null, null, null);
+        this(null, null, null, null);
     }
 
-    public grafo(ArrayList<vertice> vertices, ArrayList<ArrayList<Integer>> adjacencias, ArrayList<aresta> arestas) {
+    public grafo(ArrayList<vertice> vertices, ArrayList<ArrayList<Integer>> adjacencias, ArrayList<ArrayList<Integer>> adjacenciasDirecionado, ArrayList<aresta> arestas) {
 
         this.vertices = (vertices == null) ? new ArrayList<>() : vertices;
         this.adjacencias = (adjacencias == null) ? new ArrayList<>() : adjacencias;
+        this.adjacenciasDirecionado = (adjacenciasDirecionado == null) ? new ArrayList<>() : adjacenciasDirecionado;
         this.arestas = (arestas == null) ? new ArrayList<>() : arestas;
     }
 
-    public Iterator finalVertices(aresta e){
+    public Iterator<vertice> finalVertices(aresta e){
         ArrayList<vertice> retorno = new ArrayList<>();
         retorno.add(e.getOrigem());
         retorno.add(e.getDestino());
@@ -30,7 +33,7 @@ public class grafo{
         else return e.getOrigem();
     }
 
-    public boolean eAdjacente(aresta v, aresta w){
+    public boolean ehAdjacente(aresta v, aresta w){
 
         if (v == w) return false;
 
@@ -40,12 +43,12 @@ public class grafo{
         return false;
     }
 
-    public void substituir(vertice v, Object x){
+    public void substituir(vertice v, Object x) throws erroGrafo{
         if (!vertices.contains(v)) throw new erroGrafo("Vértice não pertence ao grafo.");
         v.setValor(x);
     }
 
-    public void substituir(aresta e, Object x){
+    public void substituir(aresta e, Object x) throws erroGrafo{
         if (!arestas.contains(e)) throw new erroGrafo("Aresta não pertence ao grafo.");
         e.setValor(x);
     }
@@ -54,16 +57,8 @@ public class grafo{
         vertice novo = new vertice(o);
         vertices.add(novo);
 
-        for (ArrayList<Integer> linha : adjacencias) {
-            linha.add(0);
-        }
-
-        ArrayList<Integer> novaLinha = new ArrayList<>();
-        for (int i = 0; i < vertices.size(); i++) {
-            novaLinha.add(0);
-        }
-
-        adjacencias.add(novaLinha);
+        expandir(adjacencias);
+        expandir(adjacenciasDirecionado);
 
         return novo;
     }
@@ -98,7 +93,12 @@ public class grafo{
             linha.remove(i);
         }
 
+        for(ArrayList<Integer> linha : adjacenciasDirecionado){
+            linha.remove(i);
+        }
+
         adjacencias.remove(i);
+        adjacenciasDirecionado.remove(i);
 
         arestas.removeIf(e -> e.getOrigem().equals(v) || e.getDestino().equals(v));
 
@@ -117,8 +117,12 @@ public class grafo{
         i = vertices.indexOf(e.getOrigem());
         int j = vertices.indexOf(e.getDestino());
 
-        adjacencias.get(i).set(j, adjacencias.get(i).get(j)-1);
-        if(i!=j) adjacencias.get(j).set(i, adjacencias.get(j).get(i)-1);
+        ArrayList<ArrayList<Integer>> m = e.ehDirecionado() ? adjacenciasDirecionado : adjacencias;
+
+        m.get(i).set(j, m.get(i).get(j) - 1);
+        if (!e.ehDirecionado() && i != j) {
+            m.get(j).set(i, m.get(j).get(i) - 1);
+        }
 
         return e.getValor();
     }
@@ -136,6 +140,39 @@ public class grafo{
 
     public Iterator<vertice> vertices(){ return vertices.iterator();}
 
-
     public Iterator<aresta> arestas(){ return arestas.iterator();}
+
+    private void expandir(ArrayList<ArrayList<Integer>> matriz) {
+        for (ArrayList<Integer> linha : matriz) linha.add(0);
+
+        ArrayList<Integer> nova = new ArrayList<>();
+        for (int k = 0; k < vertices.size(); k++) nova.add(0);
+        matriz.add(nova);
+    }
+
+    public boolean eDirecionado(aresta e){
+        return e.ehDirecionado();
+    }
+
+    public aresta inserirArestaDirecionada(vertice v, vertice w, Object o) throws erroGrafo{
+        int i = vertices.indexOf(v);
+        int j = vertices.indexOf(w);
+
+        if (i==-1 || j==-1) throw new erroGrafo("Vértice não pertence ao grafo.");
+
+        aresta novo = new aresta(v, w, o, true);
+
+        arestas.add(novo);
+        adjacenciasDirecionado.get(i).set(j, adjacenciasDirecionado.get(i).get(j)+1);
+
+        return novo;
+    }
+
+    public void imprimirMatrizND() {
+        System.out.println("Não direcionadas: " + adjacencias);
+    }
+
+    public void imprimirMatrizD() {
+        System.out.println("Direcionadas:     " + adjacenciasDirecionado);
+    }
 }
